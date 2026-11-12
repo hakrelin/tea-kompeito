@@ -1,0 +1,198 @@
+.admin-app {
+    color-scheme: light;
+    --ink: #342621;
+    --soft: #705b50;
+    --accent: #853f45;
+    --dark: #572a30;
+    --paper: #fffaf0;
+    --cream: #f5ecda;
+    --line: #dbcbb8;
+    --sans: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 208px minmax(0, 1fr);
+    color: var(--ink);
+    background: radial-gradient(ellipse at top right, #fff8e9, transparent 55%), var(--cream);
+    font: 15px/1.55 var(--sans);
+  a { text-decoration: none; color: inherit; }
+  button, input, textarea, select { font: inherit; }
+  button { cursor: pointer; }
+  button:disabled { cursor: default; opacity: .46; }
+  :focus-visible { outline: 2px solid #a75257; outline-offset: 3px; }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 1.7rem 1rem 1.2rem;
+    color: #fff3e3;
+    background: linear-gradient(155deg, #794047, #52282f 72%);
+  }
+  .admin-brand { display: flex; align-items: center; gap: .65rem; margin: 0 .3rem 2rem; }
+  .admin-brand img { background: #fce9d5; border-radius: 10px; padding: 5px; }
+  .admin-brand strong, .admin-brand small { display: block; }
+  .admin-brand strong { letter-spacing: .06em; font-size: 1rem; }
+  .admin-brand small { margin-top: .12rem; color: #ead0c5; font-size: .72rem; overflow-wrap: anywhere; }
+  .sections { display: grid; gap: .26rem; }
+  .sections a, .subsections a {
+    padding: .68rem .82rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+  }
+  .sections a[aria-current] { background: #fff1d9; color: var(--dark); font-weight: 700; }
+  .sections a:not([aria-current]):hover { background: #fff6e51b; }
+  .sidebar-actions { display: flex; flex-wrap: wrap; gap: .25rem; margin-top: auto; padding-top: 1rem; border-top: 1px solid #fff3e339; }
+  .sidebar .quiet { color: #f5dfcd; }
+  .sidebar .quiet:hover:not(:disabled) { background: #fff6e51b; }
+  .workspace { min-width: 0; }
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .75rem 1.2rem;
+    min-height: 72px;
+    padding: .8rem clamp(1rem, 3vw, 2.75rem);
+    background: #fff8ecf7;
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar p { margin: 0; font-size: .86rem; color: var(--soft); overflow-wrap: anywhere; }
+  .topbar [data-tone="error"] { color: #982b37; }
+  .topbar [data-tone="success"] { color: #3e6548; }
+  .top-actions, .record-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .6rem; }
+  .top-actions { flex-shrink: 0; }
+  .primary, .secondary, .quiet, .danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .3rem;
+    min-height: 38px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: .4rem .8rem;
+    font-size: .85rem;
+    white-space: nowrap;
+  }
+  .primary { background: var(--accent); color: #fff9eb; }
+  .primary:hover:not(:disabled) { background: var(--dark); }
+  .secondary { background: var(--paper); border-color: var(--line); color: var(--dark); }
+  .secondary:hover:not(:disabled) { border-color: #b38478; }
+  .quiet, .danger { background: transparent; color: var(--soft); }
+  .quiet:hover:not(:disabled), .danger:hover:not(:disabled) { background: #853f4510; }
+  .danger { color: #992b3c; }
+  .main { max-width: 1450px; margin: 0 auto; padding: clamp(1rem, 3vw, 2.75rem); }
+  .page-heading, .editor-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .55rem 1rem; }
+  .page-heading { margin: 0 0 1.2rem; }
+  h1, h2 { color: var(--dark); }
+  h1 { margin: 0; font-size: clamp(1.5rem, 3.5vw, 2.2rem); letter-spacing: .035em; }
+  h2 { margin: 0; font-size: 1.13rem; overflow-wrap: anywhere; }
+  #page-caption { margin: .2rem 0 0; color: var(--soft); font-size: .85rem; }
+  #page-caption:empty { display: none; }
+  .subsections { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem; }
+  .subsections a { font-size: .88rem; padding: .45rem .65rem; color: var(--soft); }
+  .subsections a[aria-current] { background: var(--paper); border-color: var(--line); color: var(--dark); }
+  .editor-layout { display: grid; grid-template-columns: minmax(180px, 240px) minmax(0, 1fr); align-items: start; gap: 1rem; }
+  .editor-layout.single { grid-template-columns: minmax(0, 1fr); }
+  .editor, .record-list {
+    min-width: 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 3px 12px #5d3e2910;
+  }
+  .record-list { padding: .75rem; }
+  .editor { padding: clamp(.85rem, 2vw, 1.4rem); }
+  .editor-heading { margin-bottom: 1rem; padding-bottom: .7rem; border-bottom: 1px solid var(--line); }
+  .list-search, .field label { display: block; font-weight: 600; font-size: .82rem; }
+  .list-search input { margin: .35rem 0 .65rem; }
+  input:not([type="file"], [type="checkbox"]), textarea, select {
+    min-width: 0;
+    width: 100%;
+    padding: .53rem .62rem;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: #fffdf7;
+    color: var(--ink);
+    font-size: .9rem;
+  }
+  textarea { resize: vertical; min-height: 100px; }
+  .records { display: grid; gap: .28rem; max-height: 62vh; overflow: auto; padding: 3px; }
+  .records button {
+    min-width: 0;
+    width: 100%;
+    display: block;
+    text-align: left;
+    color: var(--ink);
+    padding: .6rem .68rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+  }
+  .records button:hover { background: #f8efe3; }
+  .records button[aria-current] { background: #f5e8dc; border-color: #dcc0b2; }
+  .records strong, .records small { display: block; overflow-wrap: anywhere; }
+  .records strong { font-size: .91rem; }
+  .records small { margin-top: .1rem; color: var(--soft); font-size: .74rem; }
+  .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .85rem 1rem; }
+  .field label { margin-bottom: .3rem; }
+  .field.wide, .editor-empty { grid-column: 1 / -1; }
+  .field .hint, .editor-empty { margin: .3rem 0 0; color: var(--soft); font-size: .8rem; }
+  .required { color: var(--accent); }
+  .image-field { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem; }
+  .image-preview {
+    display: block;
+    max-width: min(100%, 240px);
+    max-height: 125px;
+    margin-top: .6rem;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--cream);
+    object-fit: contain;
+  }
+  .account-management, .account-list { display: grid; gap: 1rem; }
+  .account-submit { align-self: end; justify-self: start; }
+  .account-row {
+    display: grid;
+    grid-template-columns: minmax(100px, 1fr) minmax(140px, 1fr) minmax(150px, 1fr) auto;
+    align-items: end;
+    gap: .55rem .9rem;
+    padding-bottom: .9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .account-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .account-identity { align-self: center; overflow-wrap: anywhere; }
+  .account-enabled { display: flex; align-items: center; gap: .25rem; font-size: .82rem; }
+  .account-enabled input { accent-color: var(--accent); }
+  @media (max-width: 900px) {
+    & { grid-template-columns: 168px minmax(0, 1fr); }
+    .editor-layout { grid-template-columns: minmax(155px, 185px) minmax(0, 1fr); }
+  }
+  @media (max-width: 720px) {
+    & { grid-template-columns: minmax(0, 1fr); }
+    .sidebar { position: static; height: auto; padding: .8rem 1rem; }
+    .admin-brand { margin: 0 0 .75rem; }
+    .sections { display: flex; flex-wrap: wrap; }
+    .sections a { padding: .45rem .62rem; }
+    .sidebar-actions { padding-top: .45rem; margin-top: .55rem; }
+    .topbar { flex-wrap: wrap; }
+    .editor-layout { grid-template-columns: minmax(0, 1fr); }
+    .records { max-height: 165px; }
+  }
+  @media (max-width: 1050px) {
+    .account-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .account-row .account-submit { grid-column: 1 / -1; }
+  }
+  @media (max-width: 430px) {
+    .fields, .account-row { grid-template-columns: minmax(0, 1fr); }
+    .image-field { grid-template-columns: minmax(0, 1fr); }
+    .image-field button { justify-self: start; }
+  }
+}

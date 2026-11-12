@@ -1,0 +1,84 @@
+<div class="admin-app" data-view="admin">
+  <aside class="sidebar">
+    <a class="admin-brand" href="/admin/">
+      <img src="/assets/img/favicon.svg" width="38" height="38" alt="">
+      <span><strong>内容管理</strong><small id="site-name">茶与金平糖汉化组</small></span>
+    </a>
+    <nav class="sections" aria-label="后台栏目">
+      <a href="/admin/?section=works" data-section="works" aria-current="page">作品</a>
+      <a href="/admin/?section=staff" data-section="staff">人员</a>
+      <a href="/admin/?section=news" data-section="news">汉化公告</a>
+      <a href="/admin/?section=picks" data-section="picks">特别推荐</a>
+      <a href="/admin/?section=about" data-section="about">关于我们</a>
+      <a href="/admin/?section=settings" data-section="settings">站点设置</a>
+      <a href="/admin/?section=accounts" data-section="accounts">账号与权限</a>
+    </nav>
+    <div class="sidebar-actions">
+      <button class="quiet" type="button" id="export" disabled>导出数据</button>
+      <button class="quiet" type="button" id="import" disabled>导入数据</button>
+      <a class="quiet" href="/account.html">我的账号</a>
+      <input type="file" id="import-file" accept=".json,application/json" hidden>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <p id="status" role="status" aria-live="polite">正在读取项目内容…</p>
+      <div class="top-actions">
+        <a class="secondary" id="preview" href="/">查看前台 <span aria-hidden="true">↗</span></a>
+        <button class="primary" id="save" type="button" disabled>保存更改</button>
+      </div>
+    </header>
+    <div class="main">
+      <div class="page-heading">
+        <div><h1 id="page-title">作品</h1><p id="page-caption"></p></div>
+        <button class="secondary" id="add" type="button" hidden></button>
+      </div>
+      <nav class="subsections" id="about-tabs" aria-label="关于页设置" hidden>
+        <a href="/admin/?section=about&amp;tab=sections" data-about="sections" aria-current="page">正文栏目</a>
+        <a href="/admin/?section=about&amp;tab=contacts" data-about="contacts">联系方式</a>
+        <a href="/admin/?section=about&amp;tab=aboutSettings" data-about="aboutSettings">页内设置</a>
+      </nav>
+      <div class="editor-layout" id="editor-layout" hidden>
+        <section class="record-list" id="record-list" aria-label="条目列表">
+          <label class="list-search">查找条目<input type="search" id="record-filter" placeholder="按名称查找…"></label>
+          <div id="records" class="records"></div>
+        </section>
+        <section class="editor" aria-labelledby="editor-title">
+          <div class="editor-heading">
+            <h2 id="editor-title"></h2>
+            <div id="record-actions" class="record-actions" hidden>
+              <button type="button" id="up" class="quiet">上移</button>
+              <button type="button" id="down" class="quiet">下移</button>
+              <button type="button" id="remove" class="danger">删除</button>
+            </div>
+          </div>
+          <div id="fields" class="fields"></div>
+        </section>
+      </div>
+      <div class="account-management" id="account-management" hidden>
+        <section class="editor" aria-labelledby="add-account-title">
+          <div class="editor-heading"><h2 id="add-account-title">创建账号</h2></div>
+          <form id="create-account" method="post" class="fields">
+            <div class="field">
+              <label for="new-username">账号</label>
+              <input id="new-username" name="username" minlength="3" maxlength="32" autocomplete="off" spellcheck="false" required>
+              <p class="hint">3 至 32 个字母、数字、点、下划线或连字符。</p>
+            </div>
+            <div class="field">
+              <label for="new-password">初始密码</label>
+              <input id="new-password" name="password" type="password" minlength="10" maxlength="128" autocomplete="new-password" required>
+              <p class="hint">至少 10 个字符。</p>
+            </div>
+            <div class="field"><label for="new-role">账号权限</label><select id="new-role" name="role"></select></div>
+            <button class="primary account-submit" type="submit">创建账号</button>
+          </form>
+        </section>
+        <section class="editor" aria-labelledby="account-list-title">
+          <div class="editor-heading"><h2 id="account-list-title">现有账号</h2></div>
+          <div id="accounts" class="account-list"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>

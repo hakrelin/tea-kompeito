@@ -1,0 +1,53 @@
+.account-page {
+  display: grid;
+  place-items: center;
+}
+.account-card {
+  width: min(100%, 27rem);
+  padding: clamp(1.4rem, 5vw, 2.65rem);
+  border: 1px solid #e5c599;
+  background: var(--paper);
+  box-shadow: 0 .45rem 1.35rem #40191424;
+  color: var(--red-ink);
+}
+.account-home { font: 400 1rem/1.3 var(--nav-type); }
+.account-home:hover, .account-secondary:hover { text-decoration: underline; }
+.account-card h2 {
+  margin: .8rem 0 1.15rem;
+  padding-bottom: .55rem;
+  border-bottom: 1px solid #9b544b77;
+  font: 400 clamp(1.65rem, 6vw, 2.25rem)/1.25 var(--nav-type);
+  overflow-wrap: anywhere;
+}
+#login { display: grid; gap: .85rem; }
+#login label { display: grid; gap: .3rem; font-size: .95rem; }
+#login input {
+  width: 100%;
+  min-width: 0;
+  padding: .6rem .7rem;
+  border: 1px solid #b07c67;
+  border-radius: 3px;
+  background: #fffaf0;
+  color: #432521;
+  font: inherit;
+}
+.account-actions { display: flex; flex-wrap: wrap; gap: .55rem .7rem; }
+.account-action, .account-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: .5rem .95rem;
+  border: 1px solid var(--red);
+  border-radius: 3px;
+  font: 400 1rem/1.2 var(--nav-type);
+  cursor: pointer;
+}
+.account-action { background: var(--red); color: #fff4de; }
+.account-action:hover { background: var(--red-ink); }
+.account-secondary { background: transparent; color: var(--red-ink); }
+.account-action:disabled, .account-secondary:disabled { opacity: .65; cursor: default; }
+#account-status { margin: .9rem 0 0; font-size: .875rem; }
+#account-status:empty { display: none; }
+#account-switch { margin: .85rem 0 0; font-size: .9rem; }
+#account-switch a { text-decoration: underline; text-underline-offset: .2em; }

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nginx 配置的几个习惯 · 技术笔记</title>
+<meta name="description" content="Nginx 配置拆分、改完先测再 reload、fastcgi 参数、日志轮转的几条经验。">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="head">
+  <div class="wrap">
+    <a class="brand" href="/">技术笔记</a>
+    <nav class="nav">
+      <a href="/" class="on">笔记</a>
+      <a href="/archive.html">归档</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <h1>Nginx 配置的几个习惯</h1>
+    <p class="postmeta"><span>2026-10-24</span><span class="tag">Nginx / 运维</span></p>
+
+    <p>一台机器上放多个站点之后，配置散在主文件里改起来最容易出事。下面几条是踩过坑之后固定下来的做法。</p>
+
+    <h2>1. 站点配置全部拆到 conf.d</h2>
+    <p>主文件只留全局参数，站点一个域名一个文件：</p>
+    <pre><code># /etc/nginx/nginx.conf
+http {
+    include       mime.types;
+    sendfile      on;
+    keepalive_timeout 65;
+    server_tokens off;
+    client_max_body_size 128m;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    include /etc/nginx/conf.d/*.conf;
+}</code></pre>
+    <p>注意 conf.d 里要有一个显式的 <code>default_server</code>，否则直接用 IP 或未绑定的 Host 访问时，落到的会是文件名排序最前的那个 server，排查起来很费劲。</p>
+
+    <h2>2. 改完先 nginx -t，再 reload</h2>
+    <pre><code>nginx -t && systemctl reload nginx</code></pre>
+    <p><code>reload</code> 是平滑重载，已有连接不断；<code>restart</code> 会直接断掉。另一个容易误判的点：<code>reload</code> 失败时旧进程照旧在跑，站点看起来"没事"，以为自己改对了。用 <code>nginx -T</code> 打印当前实际加载的完整配置来核对，比看文件可靠。</p>
+
+    <h2>3. PHP 段别漏 SCRIPT_FILENAME</h2>
+    <pre><code>location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_pass unix:/run/php-fpm/www.sock;
+    fastcgi_index index.php;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_read_timeout 120;
+}</code></pre>
+    <p>两条经验：</p>
+    <ul>
+      <li>少了 <code>SCRIPT_FILENAME</code>，现象不是 502，而是 php-fpm 返回 <code>File not found.</code>，很容易误判成路径问题。</li>
+      <li><code>try_files $uri =404;</code> 不能省，否则不存在的 .php 会被直接丢给 fastcgi。</li>
+    </ul>
+
+    <h2>4. 隐藏版本号</h2>
+    <pre><code>server_tokens off;</code></pre>
+    <p>错误页里不再带 <code>nginx/1.30.6</code>。只是减少一点无差别扫描的噪音，不算安全措施。</p>
+
+    <h2>5. 源码装的 nginx 要自己配日志轮转</h2>
+    <p>发行版包会带 logrotate 配置，编译安装的不会，日志会一直涨：</p>
+    <pre><code>/www/wwwlogs/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 nginx nginx
+    postrotate
+        [ -f /run/nginx.pid ] &amp;&amp; kill -USR1 $(cat /run/nginx.pid)
+    endscript
+}</code></pre>
+    <p><code>USR1</code> 才是"重开日志文件"，<code>HUP</code> 是"重载配置"。写错成 HUP 的话，轮转一次就重载一次配置，出问题时很难想到是这里。</p>
+
+    <h2>6. 上传大小默认只有 1m</h2>
+    <pre><code>client_max_body_size 128m;</code></pre>
+    <p>放到 <code>http</code> 或具体 <code>server</code> 段都行。现象是 <code>413 Request Entity Too Large</code>，跟 PHP 的 <code>upload_max_filesize</code> 是两回事，两边都要改。</p>
+
+    <h2>检查清单</h2>
+    <ul>
+      <li><code>nginx -t</code> 通过</li>
+      <li><code>nginx -T | grep server_name</code> 能对上站点</li>
+      <li>日志文件有写入、有轮转</li>
+      <li>默认站点是预期的那个</li>
+    </ul>
+  </div>
+</main>
+
+<div class="foot">
+  <div class="wrap">
+    <span>© 2026 hakre</span>
+    <!-- <span>ICP 备案号：京ICP备00000000号-1</span> -->
+  </div>
+</div>
+
+</body>
+</html>

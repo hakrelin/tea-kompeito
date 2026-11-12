@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>systemd 服务起不来的排查顺序 · 技术笔记</title>
+<meta name="description" content="systemd 服务启动失败时的排查顺序与常见退出码对照。">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="head">
+  <div class="wrap">
+    <a class="brand" href="/">技术笔记</a>
+    <nav class="nav">
+      <a href="/" class="on">笔记</a>
+      <a href="/archive.html">归档</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <h1>systemd 服务起不来的排查顺序</h1>
+    <p class="postmeta"><span>2026-09-18</span><span class="tag">systemd / Linux</span></p>
+
+    <p>典型现象：<code>systemctl start</code> 没有任何报错，紧接着 <code>systemctl status</code> 却是 <code>inactive (dead)</code>，或者第二天发现服务半夜重启过一轮。按下面的顺序走，基本一轮就能定位。</p>
+
+    <h2>1. 先看 status</h2>
+    <pre><code>systemctl status myapp.service -l --no-pager</code></pre>
+    <p>重点看三样：Main PID 有没有值、<code>Active:</code> 后面括号里的内容、最后几行日志。带 <code>code=exited, status=xxx</code> 的直接跳到第 5 节的退出码对照。</p>
+
+    <h2>2. 再看 unit 自己的日志</h2>
+    <pre><code>journalctl -u myapp.service -n 80 --no-pager
+journalctl -u myapp.service --since "10 min ago"</code></pre>
+    <p>如果这里是空的，通常意味着进程根本没被执行起来（unit 层面的问题），而不是程序内部报错。</p>
+
+    <h2>3. 手动跑一遍 ExecStart</h2>
+    <p>最关键的一步：把 <code>ExecStart</code> 那条命令原样拿出来，<strong>用 unit 里 <code>User=</code> 指定的身份</strong>跑：</p>
+    <pre><code>systemctl cat myapp.service | grep -E 'ExecStart|User|WorkingDirectory|Environment'
+sudo -u app /usr/bin/myapp --config /etc/myapp/config.yml</code></pre>
+    <p>不带 <code>sudo -u</code> 直接用 root 跑，权限问题会被掩盖掉——而权限恰恰是最常见的原因。</p>
+
+    <h2>4. 检查这四处</h2>
+    <ul>
+      <li><code>WorkingDirectory</code> 路径是否存在（不存在报 <code>200/CHDIR</code>）</li>
+      <li>程序文件是否有执行权限，shebang / 解释器路径对不对（<code>203/EXEC</code>）</li>
+      <li><code>User=</code> 指定的用户是否存在（<code>217/USER</code>）</li>
+      <li><code>EnvironmentFile</code> 里的变量是否真的被读到（<code>systemctl show myapp -p Environment</code>）</li>
+    </ul>
+
+    <h2>5. 退出码对照</h2>
+    <ul>
+      <li><code>203/EXEC</code> — 找不到可执行文件，或没有执行权限，或解释器路径错</li>
+      <li><code>200/CHDIR</code> — 工作目录不存在</li>
+      <li><code>217/USER</code> — <code>User=</code> 指定的账户不存在</li>
+      <li><code>226/NAMESPACE</code> — 沙箱相关的命名空间起不来（<code>PrivateTmp</code>、<code>ProtectSystem</code> 之类设得太狠）</li>
+      <li><code>1/FAILURE</code> — 程序自己退出的，回去看第 2 步的日志</li>
+    </ul>
+
+    <h2>6. Type 写错会假装成功</h2>
+    <p>后台常驻的程序如果写成 <code>Type=simple</code>，主进程一 fork 就退出，systemd 认为"服务结束了"，于是立刻 inactive；反过来，前台程序写成 <code>Type=forking</code> 又没有 <code>PIDFile</code>，systemd 会一直等到超时再报失败。</p>
+    <pre><code>[Service]
+Type=simple
+User=app
+WorkingDirectory=/opt/myapp
+EnvironmentFile=/etc/myapp/env
+ExecStart=/usr/bin/myapp --config /etc/myapp/config.yml
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=65535</code></pre>
+    <p>判断方法：程序默认前台跑就写 <code>simple</code>；会自己 daemonize 才用 <code>forking</code>，并且必须给 <code>PIDFile</code>。</p>
+
+    <h2>7. 收尾两个命令</h2>
+    <pre><code>systemd-analyze verify /etc/systemd/system/myapp.service
+systemctl daemon-reload</code></pre>
+    <p>改完 unit 文件忘了 <code>daemon-reload</code> 的话，跑的还是旧配置——这点和 nginx 忘了 reload 是一样的坑。</p>
+  </div>
+</main>
+
+<div class="foot">
+  <div class="wrap">
+    <span>© 2026 hakre</span>
+    <!-- <span>ICP 备案号：京ICP备00000000号-1</span> -->
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小内存机器把 PHP-FPM 换成 ondemand · 技术笔记</title>
+<meta name="description" content="PHP-FPM 三种进程管理模式的取舍，以及 1.6G 内存机器上的实测与副作用。">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="head">
+  <div class="wrap">
+    <a class="brand" href="/">技术笔记</a>
+    <nav class="nav">
+      <a href="/" class="on">笔记</a>
+      <a href="/archive.html">归档</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <h1>小内存机器把 PHP-FPM 换成 ondemand</h1>
+    <p class="postmeta"><span>2026-09-02</span><span class="tag">PHP / 调优</span></p>
+
+    <p>一台 1.6 G 内存的机器，装了 PHP-FPM 之后空闲时也常驻一堆 worker，加上数据库和面板，随时在 OOM 边缘。把进程管理方式从 <code>dynamic</code> 换成 <code>ondemand</code> 之后，空闲内存立刻宽松了。</p>
+
+    <h2>三种模式的区别</h2>
+    <ul>
+      <li><code>static</code> — 固定开 <code>pm.max_children</code> 个进程，常驻不回收。最稳、内存占用最高。</li>
+      <li><code>dynamic</code> — 在 min/max 之间伸缩，空闲超过 <code>pm.process_idle_timeout</code> 才回收。默认值，适合访问有起伏但总体繁忙的站。</li>
+      <li><code>ondemand</code> — 平时几乎为 0 个，来请求才 fork。<strong>没流量 = 不占内存</strong>。</li>
+    </ul>
+
+    <h2>改法</h2>
+    <pre><code>; /etc/php-fpm.d/zz-custom.conf
+[www]
+user = nginx
+group = nginx
+listen = /run/php-fpm/www.sock
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
+
+pm = ondemand
+pm.max_children = 10
+pm.process_idle_timeout = 10s
+pm.max_requests = 500
+
+php_admin_value[memory_limit] = 128M
+php_admin_flag[expose_php] = off</code></pre>
+    <p><code>zz-custom.conf</code> 这类命名是为了保证在 <code>www.conf</code> 之后加载，同名的键会覆盖前面的值，不用去改发行版自带的文件。</p>
+
+    <h2>改完先算一下上限</h2>
+    <p><code>pm.max_children</code> 不是越大越好，按单个进程的实际 RSS 估算：</p>
+    <pre><code>ps -o rss=,cmd= -C php-fpm | awk '{sum+=$1} END {printf "%.1f MB / %d procs\n", sum/1024, NR}'
+free -m</code></pre>
+    <p>一个干净的 PHP 进程大约 30–40 MB，挂着 opcache 和几个扩展会更高。1.6 G 的机器上留 400 MB 给系统与数据库，剩下能开多少个就清楚了。</p>
+
+    <h2>副作用</h2>
+    <ul>
+      <li>空闲后的第一个请求要等进程 fork，慢几十到几百毫秒；低流量站完全无感。</li>
+      <li>并发突增时 fork 有上限，超过 <code>pm.max_children</code> 的请求会排队，表现为偶发 502 / 504——要配合 <code>pm.max_children</code> 和 <code>request_terminate_timeout</code> 一起看。</li>
+      <li>进程反复创建销毁，opcache 命中率下降，所以 <code>opcache.enable</code> 别关。</li>
+    </ul>
+
+    <h2>顺带确认的几项</h2>
+    <pre><code>systemctl restart php-fpm
+systemctl status php-fpm --no-pager
+ss -lx | grep php-fpm      # socket 在不在
+php-fpm -t                 # 配置语法</code></pre>
+    <p>如果 nginx 报 <code>502 Bad Gateway</code>，先确认 socket 路径和 <code>listen.owner/group</code> 跟 nginx 的 worker 用户一致——<code>0660</code> 的 socket 权限不对时，nginx 连不上也只会给你一个 502。</p>
+  </div>
+</main>
+
+<div class="foot">
+  <div class="wrap">
+    <span>© 2026 hakre</span>
+    <!-- <span>ICP 备案号：京ICP备00000000号-1</span> -->
+  </div>
+</div>
+
+</body>
+</html>

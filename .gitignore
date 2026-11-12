@@ -1,0 +1,24 @@
+# 运行时数据：账号库、内容改动、受限上传文件，绝不入库
+/data/
+
+# 依赖与构建产物
+__pycache__/
+*.pyc
+*.tar.gz
+*.log
+node_modules/
+.DS_Store
+Thumbs.db
+
+# 设计稿处理过程中的临时裁切、截图与一次性分析脚本
+work/crop-*.png
+work/test-key.png
+work/final/
+work/shot/
+work/ep-*/
+work/analyze*.py
+work/colors.py
+work/crop.py
+work/crop2.py
+work/measure.py
+work/test_key.py

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>技术笔记</title>
+<meta name="description" content="服务器运维、脚本与数据库方面的技术笔记。">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="head">
+  <div class="wrap">
+    <a class="brand" href="/">技术笔记</a>
+    <nav class="nav">
+      <a href="/" class="on">笔记</a>
+      <a href="/archive.html">归档</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+
+    <div class="yearline">2026</div>
+    <ul class="list">
+      <li>
+        <time>10-24</time>
+        <div>
+          <a href="/nginx-conf.html">Nginx 配置的几个习惯</a>
+          <span class="desc">配置拆分、改完先测再 reload、日志轮转</span>
+        </div>
+      </li>
+      <li>
+        <time>09-18</time>
+        <div>
+          <a href="/systemd-debug.html">systemd 服务起不来的排查顺序</a>
+          <span class="desc">从 journalctl 到 ExecStart 手动复现</span>
+        </div>
+      </li>
+      <li>
+        <time>09-02</time>
+        <div>
+          <a href="/phpfpm-ondemand.html">小内存机器把 PHP-FPM 换成 ondemand</a>
+          <span class="desc">pm 三种模式的取舍与实测内存差别</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="yearline">2026 上半年</div>
+    <ul class="list">
+      <li>
+        <time>07-20</time>
+        <div>
+          <span>EXPLAIN 里 type 列怎么看</span>
+          <span class="desc">ALL / index / range / ref / const 的差别（待整理）</span>
+        </div>
+      </li>
+      <li>
+        <time>07-05</time>
+        <div>
+          <span>一次慢查询：索引没用上的真实原因</span>
+          <span class="desc">字段上做了函数运算，索引直接失效（待整理）</span>
+        </div>
+      </li>
+    </ul>
+
+  </div>
+</main>
+
+<div class="foot">
+  <div class="wrap">
+    <span>© 2026 hakre</span>
+    <!-- 备案通过后取消注释并填入备案号 -->
+    <!-- <span>ICP 备案号：京ICP备00000000号-1</span> -->
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>记录 · hakre</title>
+<meta name="description" content="hakre的学习记录：服务器运维、脚本工具与数据库调优的笔记目录。">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/">hakre</a>
+    <nav class="nav">
+      <a href="/">首页</a>
+      <a href="/about.html">关于</a>
+      <a href="/projects.html" class="active">记录</a>
+      <a href="/notes.html">说明</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <span class="eyebrow">记录</span>
+    <h1 style="font-size:26px;margin:0 0 22px;font-weight:650;">学习笔记与小结</h1>
+    <p style="color:var(--muted);">下面是我平时整理的一些笔记条目。笔记都写在自己的电脑上，这里只列出标题与一句话摘要。</p>
+
+    <section>
+      <h2>服务器运维</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Nginx 配置的几条经验</h3>
+          <p>把站点配置拆到 conf.d 下、改完先 nginx -t 再 reload、日志按天轮转——三条最省事的习惯。</p>
+          <span class="meta">2026-10-24</span>
+        </div>
+        <div class="card">
+          <h3>systemd 服务写错之后怎么排查</h3>
+          <p>从 journalctl 看起，先确认 ExecStart 能手动跑通，再检查权限与工作目录。</p>
+          <span class="meta">2026-09-18</span>
+        </div>
+        <div class="card">
+          <h3>小内存机器的 PHP-FPM 调参</h3>
+          <p>把进程管理从 dynamic 改成 ondemand，内存占用立刻降下来，代价是首个请求略慢。</p>
+          <span class="meta">2026-09-02</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>脚本与工具</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>按日期归档文件的脚本</h3>
+          <p>扫描下载目录，按月份建文件夹并移动文件，顺手跳过隐藏文件与临时文件。</p>
+          <span class="meta">2026-08-30</span>
+        </div>
+        <div class="card">
+          <h3>给日志加上一行摘要</h3>
+          <p>用几行 awk 从访问日志里统计状态码分布，把最常出错的那一类打印出来。</p>
+          <span class="meta">2026-08-11</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>数据库</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>看懂 EXPLAIN 里的 type 列</h3>
+          <p>从 ALL 到 ref 到 const，逐档说明索引有没有被用上，以及为什么顺序很重要。</p>
+          <span class="meta">2026-07-20</span>
+        </div>
+        <div class="card">
+          <h3>一次慢查询的排查过程</h3>
+          <p>表面上是缺索引，实际上是查询条件里对字段做了函数运算，导致索引失效。</p>
+          <span class="meta">2026-07-05</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>© 2026 hakre · 个人主页</span>
+    <!-- <span>ICP 备案号：京ICP备00000000号-1</span> -->
+    <span>本站为纯静态页面，不收集访客信息</span>
+  </div>
+</footer>
+
+</body>
+</html>

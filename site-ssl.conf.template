@@ -1,0 +1,53 @@
+# 站点 HTTPS 配置模板
+# 用法：证书申请成功（acme.sh）后，把本文件内容追加到
+#       /etc/nginx/conf.d/tea-kompeito.com.conf 末尾，然后
+#       nginx -t && systemctl reload nginx
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name tea-kompeito.com www.tea-kompeito.com;
+
+    root  /www/wwwroot/tea-kompeito.com;
+    index index.php index.html index.htm;
+    charset utf-8;
+
+    ssl_certificate     /etc/nginx/ssl/tea-kompeito.com.fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/tea-kompeito.com.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    access_log /www/wwwlogs/tea-kompeito.com.access.log;
+    error_log  /www/wwwlogs/tea-kompeito.com.error.log warn;
+    client_max_body_size 128m;
+
+    # 账号服务启动后，在这里引入 tea-accounts.nginx.inc，并将 www 跳转到服务配置的域名。
+    # include /etc/nginx/tea-accounts.nginx.inc;
+
+    location ~* \.(?:jpg|jpeg|png|gif|webp|svg|ico|css|js|woff2?|ttf|zip|7z|rar|apk|exe|torrent)$ {
+        expires 7d;
+        add_header Cache-Control "public";
+        access_log off;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass unix:/run/php-fpm/www.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_read_timeout 120;
+    }
+
+    location ~ /\.(?!well-known) { deny all; }
+    location ~* ^/(uploads|attachments|downloads)/.*\.(php|phtml|php5)$ { deny all; }
+}

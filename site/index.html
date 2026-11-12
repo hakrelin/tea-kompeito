@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>作品 · 茶与金平糖汉化组</title>
+<meta name="description" content="茶与金平糖汉化组的汉化作品目录，可查看作品和汉化人员。">
+<meta name="theme-color" content="#904546">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css?v=9">
+<link rel="stylesheet" href="/assets/css/account.css?v=3">
+</head>
+<body>
+
+<svg width="0" height="0" aria-hidden="true" class="paper-shape">
+  <defs>
+    <clipPath id="angel" clipPathUnits="objectBoundingBox">
+      <path d="M .366,.158
+        C .34,.113 .35,.072 .386,.043 C .448,-.012 .55,-.016 .618,.021
+        C .676,.052 .687,.098 .658,.153
+        C .758,.153 .84,.145 .931,.149 C .969,.146 .99,.149 .991,.168
+        L .998,.683 C 1,.757 1,.812 .977,.813
+        C .932,.808 .756,.553 .634,.333 C .683,.521 .726,.758 .782,.993
+        C .6,.988 .378,.993 .194,.999 C .212,.824 .316,.502 .38,.335
+        C .257,.506 .163,.697 .083,.782 C .052,.819 .046,.814 .035,.796
+        C .018,.77 .017,.72 .016,.676 L .001,.205 C 0,.173 .013,.158 .044,.158 Z"></path>
+    </clipPath>
+  </defs>
+</svg>
+
+<a class="skip-link" href="#main-content">跳到正文</a>
+<header>
+  <img class="hero" src="/assets/img/hero.webp" alt="" width="2560" height="493">
+  <div class="masthead">
+    <h1 class="brand"><a href="/index.html"><img src="/assets/img/brand.webp" width="1191" height="177" alt="茶与金平糖汉化组"></a></h1>
+    <form class="search" role="search" hidden>
+      <div class="search-field">
+        <input type="search" id="q" placeholder="搜索作品、参与者…" aria-label="搜索作品">
+        <button type="button" class="clear-search" aria-label="清空搜索" hidden>×</button>
+      </div>
+      <button type="submit" aria-label="搜索">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6.4"></circle><path d="M15.7 15.7 21 21"></path>
+        </svg>
+      </button>
+    </form>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="rail">
+    <img class="rail-top" src="/assets/img/rail-top.png" alt="" aria-hidden="true">
+    <nav class="nav" aria-label="主导航">
+      <a data-section="works" href="/index.html"><span>作品</span><span class="dot"></span></a>
+      <a data-section="staff" href="/staff.html"><span>人员</span><span class="dot"></span></a>
+      <a data-section="news" href="/news.html"><span>汉化公告</span><span class="dot"></span></a>
+      <a data-section="picks" href="/picks.html"><span>特别推荐</span><span class="dot"></span></a>
+      <a data-section="about" href="/about.html"><span>关于我们</span><span class="dot"></span></a>
+    </nav>
+    <a class="account-entry" href="/account.html">登录</a>
+    <div class="rail-stairs" aria-hidden="true"><img src="/assets/img/stairs.png" alt=""></div>
+  </aside>
+
+  <main class="panel" id="main-content" tabindex="-1" aria-busy="true">
+    <div class="panel-body">
+      <p class="empty" id="view-status" role="status">正在加载站点内容…</p>
+      <noscript><p>请启用 JavaScript 查看本站内容。</p></noscript>
+    </div>
+  </main>
+  <img class="page-edge" src="/assets/img/flowers.png" alt="">
+</div>
+
+<template id="view-works">
+  <div data-view="works" class="panel-body">
+    <div class="works">
+      <section class="catalog" aria-labelledby="catalog-heading">
+        <div class="page-head catalog-head">
+          <h2 id="catalog-heading">作品</h2>
+          <span class="catalog-count" role="status" aria-atomic="true"></span>
+        </div>
+        <p class="sample-note catalog-note">示例作品 · 画面为站点插画</p>
+        <p class="empty" role="status" hidden>没有找到对应的作品，换个关键词试试。</p>
+        <div class="catalog-scroll" id="catalog-scroll" role="region" aria-label="作品列表" tabindex="0">
+          <div class="works-grid" id="works-grid">
+          </div>
+        </div>
+        <input type="range" class="catalog-scrollbar" id="catalog-scrollbar" min="0" max="100" value="0"
+          aria-label="滚动作品列表" aria-controls="catalog-scroll" aria-orientation="vertical" hidden>
+      </section>
+
+      <aside class="detail" id="work-detail" tabindex="-1" aria-labelledby="d-name" hidden>
+        <div class="rule"></div>
+        <img class="cover" id="d-cover" alt="" width="588" height="836">
+        <div class="detail-copy">
+          <h3 class="name" id="d-name" aria-live="polite"></h3>
+          <div class="detail-meta">
+            <p class="detail-original" id="d-orig" lang="ja"></p>
+            <p class="detail-status"><span id="d-type"></span><span id="d-status"></span></p>
+          </div>
+          <dl>
+            <dt>图源</dt><dd id="d-source"></dd>
+            <dt>翻译</dt><dd id="d-tl"></dd>
+            <dt>嵌字</dt><dd id="d-et"></dd>
+            <dt>修图</dt><dd id="d-tw"></dd>
+            <dt>校对</dt><dd id="d-pr"></dd>
+            <dt>链接</dt><dd id="d-link"></dd>
+          </dl>
+        </div>
+        <details class="work-extra">
+          <summary>作品简介</summary>
+          <p id="d-desc"></p>
+        </details>
+        <div class="detail-navigation" role="group" aria-label="切换作品" hidden>
+          <button type="button" class="page-turn page-turn--previous" data-work-step="-1" aria-controls="work-detail">
+            <span class="turn-arrow" aria-hidden="true"></span>上一部
+          </button>
+          <button type="button" class="page-turn" data-work-step="1" aria-controls="work-detail">
+            下一部<span class="turn-arrow" aria-hidden="true"></span>
+          </button>
+        </div>
+        <a class="back-to-works" href="#works-grid">返回作品列表</a>
+      </aside>
+    </div>
+  </div>
+</template>
+
+<template id="view-staff">
+  <div data-view="staff" class="panel-body">
+    <h2 class="visually-hidden">人员</h2>
+    <div class="staff-grid" id="staff-grid">
+    </div>
+    <nav class="catalog-pages" aria-label="人员翻页" hidden>
+      <button type="button" class="page-turn page-turn--previous" data-page-step="-1" aria-controls="staff-grid">
+        <span class="turn-arrow" aria-hidden="true"></span>上一页
+      </button>
+      <span class="page-count" role="status" aria-atomic="true"></span>
+      <button type="button" class="page-turn" data-page-step="1" aria-controls="staff-grid">
+        下一页<span class="turn-arrow" aria-hidden="true"></span>
+      </button>
+    </nav>
+    <p class="empty" role="status" hidden>没有找到匹配的成员。</p>
+    <dialog class="staff-dialog" id="staff-details" aria-labelledby="staff-name">
+      <div class="staff-profile">
+        <form method="dialog">
+          <button type="submit" class="paper-button close-profile" aria-label="关闭人员详情" autofocus>×</button>
+        </form>
+        <p id="staff-role"></p>
+        <h2 id="staff-name"></h2>
+        <p id="staff-bio" hidden></p>
+        <a class="paper-button" id="staff-works" href="/index.html">查看参与作品（示例）</a>
+      </div>
+    </dialog>
+  </div>
+</template>
+
+<template id="view-news">
+  <div data-view="news" class="panel-body">
+    <div class="page-head">
+      <h2>汉化公告</h2>
+    </div>
+    <p class="sample-note">示例公告</p>
+
+    <ul class="notice"></ul>
+
+    <p class="empty" role="status" hidden>没有匹配的公告。</p>
+
+  </div>
+</template>
+
+<template id="view-picks">
+  <div data-view="picks" class="panel-body">
+    <div class="page-head">
+      <h2>特别推荐</h2>
+    </div>
+    <p class="sample-note">示例推荐 · 画面为站点插画</p>
+
+    <div class="picks"></div>
+
+    <p class="empty" role="status" hidden>没有找到匹配的推荐。</p>
+
+  </div>
+</template>
+
+<template id="view-about">
+  <div data-view="about" class="panel-body">
+    <div class="page-head">
+      <h2>关于我们</h2>
+    </div>
+    <p class="sample-note">简介、招新和联系方式为示例资料。</p>
+
+    <div class="about-grid">
+      <div class="about-copy"></div>
+      <aside class="about-card"></aside>
+    </div>
+
+    <p class="empty" role="status" hidden>没有找到匹配的内容。</p>
+
+  </div>
+</template>
+
+<template id="view-account">
+  <div data-view="account" class="panel-body account-page">
+    <section class="account-card" aria-labelledby="account-title">
+      <a class="account-home" href="/index.html">‹ 返回作品</a>
+      <h2 id="account-title">账号登录</h2>
+      <form id="login" method="post" hidden>
+        <label>账号<input name="username" autocomplete="username" required minlength="3" maxlength="32" spellcheck="false"></label>
+        <label>密码<input name="password" type="password" autocomplete="current-password" required maxlength="128"></label>
+        <label id="confirm-field" hidden>确认密码<input name="confirm" type="password" autocomplete="new-password" maxlength="128" disabled></label>
+        <button class="account-action" type="submit" id="login-submit">登录</button>
+      </form>
+      <section id="profile" hidden>
+        <p id="profile-role"></p>
+        <div class="account-actions">
+          <a class="account-action" href="/index.html">查看作品</a>
+          <a class="account-action" href="/admin/" id="admin-link" hidden>内容管理</a>
+          <button class="account-secondary" type="button" id="logout">退出登录</button>
+        </div>
+      </section>
+      <p id="account-status" role="status" aria-live="polite">正在读取登录状态…</p>
+      <p id="account-switch" hidden><span>还没有账号？</span> <a href="/account.html?mode=register">注册</a></p>
+    </section>
+  </div>
+</template>
+
+<script type="module" src="/assets/js/site.js?v=10"></script>
+</body>
+</html>
