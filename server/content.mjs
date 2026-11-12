@@ -72,8 +72,9 @@ export function validateContent(data) {
   settings.staffSlots = slots;
   for (const key of ["brand", "banner"]) checkUrl(settings[key], "站点图片", true);
 
-  const works = rows(data.works, "作品", "id name orig type status source tl et tw pr cover link linkHref desc keywords access",
-    { required: ["id", "name"], urls: ["linkHref"], images: ["cover"], ids: true });
+  const works = rows(data.works, "作品",
+    "id name orig type status source tl et tw pr cover thumb link linkHref desc keywords access",
+    { required: ["id", "name"], urls: ["linkHref"], images: ["cover", "thumb"], ids: true });
   for (const [index, work] of works.entries()) {
     // Earlier workboard imports kept the credit in the description and search keywords.
     if (work.id.startsWith("board-") && !Object.hasOwn(data.works[index], "source")) {
@@ -85,11 +86,19 @@ export function validateContent(data) {
       }
     }
     work.access ||= "public";
+    // 老数据没有缩略图字段：只要封面在 catalog-covers 里，就按 <id>-t.webp 约定补一张网格用缩略图。
+    if (!work.thumb && /^assets\/catalog-covers\/[^/]+\.webp$/.test(work.cover)) {
+      work.thumb = work.cover.replace(/\.webp$/, "-t.webp");
+    }
     if (!levels.has(work.access)) invalid("作品可见范围无效。");
-    const { cover, linkHref } = work;
+    const { cover, thumb, linkHref } = work;
     if (work.access === "public") {
-      if (filePath.test(cover) || filePath.test(linkHref)) invalid("公开作品请使用公开的封面和链接。");
-    } else if ((cover && !illustrations.has(cover) && !filePath.test(cover)) || (linkHref && !filePath.test(linkHref))) {
+      if (filePath.test(cover) || filePath.test(thumb) || filePath.test(linkHref)) {
+        invalid("公开作品请使用公开的封面和链接。");
+      }
+    } else if ((cover && !illustrations.has(cover) && !filePath.test(cover)) ||
+               (thumb && !illustrations.has(thumb) && !filePath.test(thumb)) ||
+               (linkHref && !filePath.test(linkHref))) {
       invalid(`《${work.name}》的受限封面和下载文件须通过受限上传保存。`);
     }
   }

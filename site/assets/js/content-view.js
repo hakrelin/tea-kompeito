@@ -18,6 +18,7 @@ function cover(src, lazy = false) {
   const image = node("img");
   image.src = src;
   image.alt = "";
+  image.decoding = "async";
   if (lazy) image.loading = "lazy";
   return image;
 }
@@ -33,11 +34,13 @@ function workCard(work) {
     button.dataset[field] = work[field] || "";
   }
   button.dataset.search = work.keywords || "";
+  // 网格用缩略图，详情栏用原图；详情通过 data-cover 取原图，不再复用缩略图放大。
+  button.dataset.cover = work.cover || defaultCover;
 
   const art = node("span", "work-art");
   const frame = node("span", "frame");
   frame.setAttribute("aria-hidden", "true");
-  art.append(cover(work.cover || defaultCover, true), frame);
+  art.append(cover(work.thumb || work.cover || defaultCover, true), frame);
 
   const caption = node("span", "work-caption");
   const title = node("span", "work-label", work.name);

@@ -236,6 +236,11 @@ function makeServer(directory, accounts, origin) {
       }
       if (read && path.startsWith("/assets/")) {
         const file = staticAsset(path);
+        // 图片变化很少，长缓存；脚本样式靠 ?v= 版本号，给短缓存即可。
+        const cache = /^\/assets\/(?:img|catalog-covers)\//.test(path)
+          ? "public, max-age=2592000"
+          : path.startsWith("/assets/uploads/") ? "public, max-age=604800" : "public, max-age=3600";
+        response.setHeader("Cache-Control", cache);
         return sendFile(request, response, file, mimeTypes.get(extname(file).toLowerCase()) || "application/octet-stream");
       }
       if (read && adminAssets.has(path)) {

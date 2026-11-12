@@ -79,7 +79,7 @@ node server.mjs --origin https://example.com --port 8778 --data-dir /var/lib/tea
 | 段 | 字段 |
 | --- | --- |
 | `settings` | `title` `worksTitle` `staffTitle` `newsTitle` `picksTitle` `aboutTitle` `brand` `banner` `worksNote` `newsNote` `picksNote` `aboutNote` `staffSlots` |
-| `works[]` | `id`(必填) `name`(必填) `orig` `type` `status` `source` `tl` `et` `tw` `pr` `cover` `link` `linkHref` `desc` `keywords` `access` |
+| `works[]` | `id`(必填) `name`(必填) `orig` `type` `status` `source` `tl` `et` `tw` `pr` `cover` `thumb` `link` `linkHref` `desc` `keywords` `access` |
 | `staff[]` | `name`(必填) `role`(必填) `bio` |
 | `news[]` | `title`(必填) `date`(必填, `YYYY-MM-DD`) `body` `href` `keywords` |
 | `picks[]` | `title`(必填) `source` `body` `cover` `href` `keywords` |
@@ -113,6 +113,37 @@ python work/build_assets.py work/mock-works.webp
 
 会重新生成 `site/assets/img/` 下的 hero、刊头、纸张、阶梯、角花等。
 正式美术稿到位后直接替换同名文件即可，比例保持一致（细节见脚本注释）。
+
+## 封面体积与带宽
+
+作品封面是页面最大的流量来源，所以做了三层处理：
+
+1. **两级图**：封面原图压到宽 ≤ 480px（`q=74`，约 33KB），另生成一张网格用的缩略图
+   `<id>-t.webp`（宽 240px，`q=62`，约 12KB）。网格只加载缩略图，选中作品时详情栏才取原图。
+   命令行重新生成：
+
+   ```bash
+   python work/optimize-covers.py          # 幂等，已处理过的会跳过
+   ```
+
+   同一批 115 张封面的体积：原 6.85MB → 原图 3.83MB + 缩略图 1.31MB；
+   首屏 16 张从约 1MB 降到约 190KB。
+
+2. **缓存**：`/assets/img/`、`/assets/catalog-covers/` 由 nginx 直接从磁盘出并带
+   `Cache-Control: max-age=2592000`，二次访问基本不产生流量；`/assets/js|css|fonts` 走 `?v=` 版本号 + 1 小时缓存。
+
+3. **对象存储（可选，推荐）**：封面可以直接搬到 OSS，把带宽从主服务器挪走。
+   脚本已经写好，桶和域名到位就能一条命令切过去：
+
+   ```bash
+   BUCKET=tea-kompeito-img BASE=https://img.example.com \
+     bash work/publish-covers-to-oss.sh /opt/tea-site-beta1/current
+   ```
+
+   它会：`aliyun oss cp` 上传全部封面（`public-read` + 30 天缓存）、抽查公开可访问、
+   把 `content-default.js` 里所有 `cover` / `thumb` 改写成 `BASE` 前缀，并留一份 `.bak`。
+   注意：当前这台机器上 `aliyun oss mb` 返回 `UserDisable`（账号未开通 OSS 或服务被停用），
+   需要先在 OSS 控制台开通并给 AccessKey 授权 `oss:PutObject`，脚本才能跑通。
 
 ## 部署
 
