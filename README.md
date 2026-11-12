@@ -132,18 +132,31 @@ python work/build_assets.py work/mock-works.webp
 2. **缓存**：`/assets/img/`、`/assets/catalog-covers/` 由 nginx 直接从磁盘出并带
    `Cache-Control: max-age=2592000`，二次访问基本不产生流量；`/assets/js|css|fonts` 走 `?v=` 版本号 + 1 小时缓存。
 
-3. **对象存储（可选，推荐）**：封面可以直接搬到 OSS，把带宽从主服务器挪走。
-   脚本已经写好，桶和域名到位就能一条命令切过去：
+3. **对象存储 + CDN（已启用）**：封面和站点切图都在七牛云，主服务器不再出图片流量。
+
+   | 项目 | 值 |
+   | --- | --- |
+   | 存储空间 | `tea-kompeito`（华东 z0，公开空间） |
+   | 加速域名 | `img.tea-kompeito.com`（HTTPS，泛域名证书 `*.tea-kompeito.com`） |
+   | CNAME | `img-tea-kompeito-com-idvsa0z.qiniudns.com`（阿里云 DNS） |
+   | 对象路径 | `covers/<id>.webp`、`covers/<id>-t.webp`、`site/<切图>` |
+   | 缓存 | CDN 7 天（按后缀可调），响应头 `Cache-Control: max-age=31536000` |
+
+   相关脚本（AK/SK 走环境变量 `QINIU_AK` / `QINIU_SK`，不要写进仓库）：
 
    ```bash
-   BUCKET=tea-kompeito-img BASE=https://img.example.com \
-     bash work/publish-covers-to-oss.sh /opt/tea-site-beta1/current
+   # 1) 传封面（230 个文件，8 秒左右）
+   QINIU_AK=... QINIU_SK=... python work/qiniu-upload.py upload
+   # 2) 把内容里的 assets/... 改写成 CDN 地址（备份 .bak）
+   python work/qiniu-migrate.py rewrite
+   # 3) 线上数据用 live 模式改写
+   python3 work/qiniu-migrate.py live /var/lib/tea-site-beta1/content.js
+   # 4) 换新证书后重新绑定 CDN 域名（服务器上执行）
+   python3 work/qiniu-https-server.py /etc/nginx/ssl/tea-kompeito.com/fullchain.crt /etc/nginx/ssl/tea-kompeito.com/private.key
    ```
 
-   它会：`aliyun oss cp` 上传全部封面（`public-read` + 30 天缓存）、抽查公开可访问、
-   把 `content-default.js` 里所有 `cover` / `thumb` 改写成 `BASE` 前缀，并留一份 `.bak`。
-   注意：当前这台机器上 `aliyun oss mb` 返回 `UserDisable`（账号未开通 OSS 或服务被停用），
-   需要先在 OSS 控制台开通并给 AccessKey 授权 `oss:PutObject`，脚本才能跑通。
+   绑定/接入用 `work/qiniu-domain-flow.py`（取 TXT 校验值 → 校验所有权 → 创建加速域名 → 打印 CNAME），
+   走的是 `api.qiniu.com` 的 Qiniu 鉴权和 `*/verify/*` 的 QBox 鉴权两套签名。
 
 ## 部署
 

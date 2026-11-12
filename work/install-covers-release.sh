@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 鍙戝竷銆屽皝闈㈢缉鐣ュ浘 + 缂撳瓨澶淬€嶈繖涓€鐗堬細鏂?release 鐩綍 鈫?鍒囪蒋閾?鈫?鑷 鈫?澶辫触鑷姩鍥炴粴
+# 发布「封面缩略图 + 缓存头」这一版：新 release 目录 → 切软链 → 自检 → 失败自动回滚
 set -euo pipefail
 APP=/opt/tea-site-beta1
 SERVICE=tea-site-beta1

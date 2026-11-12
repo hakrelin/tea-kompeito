@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# beta1锛氶潤鎬佸浘鐗囦氦缁?nginx 鐩存帴浠庣鐩樺嚭锛堥暱缂撳瓨锛夛紝骞跺紑鍚?gzip
+# beta1: 静态图片交给 nginx 直接从磁盘出（长缓存），并开启 gzip
 set -euo pipefail
 CONF=/etc/nginx/conf.d/zz-tea-site-beta1.conf
 ls -la /etc/nginx/conf.d/ | grep -E 'zz-tea-site-beta1' || true

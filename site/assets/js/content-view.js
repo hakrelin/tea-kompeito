@@ -1,4 +1,4 @@
-const defaultCover = "assets/img/work-cover.webp";
+const defaultCover = "https://img.tea-kompeito.com/site/work-cover.webp";
 
 function node(tag, className, text) {
   const element = document.createElement(tag);

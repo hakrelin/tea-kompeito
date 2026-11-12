@@ -23,3 +23,6 @@ work/crop2.py
 work/measure.py
 work/test_key.py
 work/smoke/
+
+# 迁移脚本留下的临时备份
+*.bak
