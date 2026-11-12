@@ -158,6 +158,37 @@ python work/build_assets.py work/mock-works.webp
    绑定/接入用 `work/qiniu-domain-flow.py`（取 TXT 校验值 → 校验所有权 → 创建加速域名 → 打印 CNAME），
    走的是 `api.qiniu.com` 的 Qiniu 鉴权和 `*/verify/*` 的 QBox 鉴权两套签名。
 
+4. **后台上传直接进对象存储**：`/admin/api/upload` 现在先把图片传到七牛 `uploads/`，
+   返回 `https://img.tea-kompeito.com/uploads/<sha>.webp`；没配 `QINIU_AK/SK` 时自动回落到本地
+   `site/assets/uploads/`。这类封面没有 `-t.webp` 文件，`content.mjs` 会用七牛的图片处理
+   （`?imageView2/1/w/240`）当网格缩略图，所以后台新传的封面同样不会拖慢列表。
+
+   密钥放在 `/etc/tea-site/qiniu.env`（`600 root`），systemd 用
+   `EnvironmentFile=` 注入给服务，仓库里只读环境变量。
+
+## 证书自动续期
+
+续期本身由服务器上的 cron 负责，每天 04:23 跑 `/opt/acme-kompeito/renew.sh`：
+ACME DNS-01（阿里云解析）签 `tea-kompeito.com` + `*.tea-kompeito.com`，剩 30 天内才真正重签，
+换证后备份旧证书、`nginx -t` 通过才 reload，失败自动回滚。
+
+CDN 那边由钩子跟上，同一个脚本里多了一步：
+
+```
+nginx 部署新证书 → python3 /usr/local/bin/qiniu-cdn-cert.py
+                   ├─ GET /domain/<域名> 读当前 https.certId
+                   ├─ GET /sslcert/<id> 比对 PEM，一致就退出（可反复调用）
+                   ├─ 私钥转 PKCS#8 → POST /sslcert 拿新 certID
+                   ├─ PUT /domain/<域名>/httpsconf 换绑（forceHttps 关、http2 开）
+                   └─ 清理 24 小时前的旧证书（太早删会报「证书已绑定域名」）
+```
+
+- 脚本：`work/qiniu-cdn-cert.py`，装到 `/usr/local/bin/`；`--force` 可跳过比对强制换绑
+- 日志：与续期共用 `/var/log/acme-kompeito.log`
+- 失败只会打 `[warn]`，不会影响 nginx 已生效的新证书；手动补跑：
+  `python3 /usr/local/bin/qiniu-cdn-cert.py --force`
+- 安装脚本：`work/install-qiniu-integration.sh`（写 env 文件、装钩子、加 systemd override，幂等）
+
 ## 部署
 
 线上是「Node 进程 + Nginx 反代」，进程只监听 `127.0.0.1`，由 systemd 拉起：

@@ -86,14 +86,16 @@ export function validateContent(data) {
       }
     }
     work.access ||= "public";
-    // 老数据没有缩略图字段：按 <id>-t.webp 约定补一张网格用缩略图。
-    // 封面既可能在本地 catalog-covers，也可能已经迁到对象存储。
+    // 老数据没有缩略图字段：按约定补一张网格用缩略图。
+    // 本地 catalog-covers / 对象存储 covers 用 <id>-t.webp；后台上传的图走七牛图片处理裁到 240 宽。
     if (!work.thumb) {
       const remote = /^https:\/\/img\.tea-kompeito\.com\/covers\/([^/]+)\.webp$/.exec(work.cover);
       if (/^assets\/catalog-covers\/[^/]+\.webp$/.test(work.cover)) {
         work.thumb = work.cover.replace(/\.webp$/, "-t.webp");
       } else if (remote && !remote[1].endsWith("-t")) {
         work.thumb = `https://img.tea-kompeito.com/covers/${remote[1]}-t.webp`;
+      } else if (/^https:\/\/img\.tea-kompeito\.com\/uploads\/[^?]+\.(?:webp|jpg|jpeg|png|gif)$/i.test(work.cover)) {
+        work.thumb = work.cover + "?imageView2/1/w/240";
       }
     }
     if (!levels.has(work.access)) invalid("作品可见范围无效。");

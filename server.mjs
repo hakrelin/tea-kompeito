@@ -9,6 +9,7 @@ import { pipeline } from "node:stream/promises";
 import { parseArgs } from "node:util";
 import { Accounts, sessionAge } from "./server/accounts.mjs";
 import { HttpError } from "./server/errors.mjs";
+import { qiniuConfigured, uploadImage } from "./server/qiniu.mjs";
 import {
   ContentStore, filePath, revision, validateContent, validateFiles, visibleContent, visibleWork, writeAtomic,
 } from "./server/content.mjs";
@@ -340,7 +341,13 @@ function makeServer(directory, accounts, origin) {
         if (path === "/admin/api/upload" && method === "POST") {
           const raw = await readBody(request, maxImage);
           requireAdmin();
-          const name = revision(raw).slice(0, 32) + "." + imageType(raw);
+          const type = imageType(raw);
+          // 优先传到对象存储（封面不占主服务器带宽），没配 AK 就退回本地目录。
+          if (qiniuConfigured()) {
+            const url = await uploadImage(raw, type, mimeTypes.get("." + type));
+            return json(response, { path: url }, 201);
+          }
+          const name = revision(raw).slice(0, 32) + "." + type;
           const uploads = join(site, "assets", "uploads");
           mkdirSync(uploads, { recursive: true });
           writeAtomic(join(uploads, name), raw);
